@@ -1,0 +1,19 @@
+{
+  "systemInstruction": {
+    "file": "HOME_DIR_PLACEHOLDER/.gemini/system_prompt.md"
+  },
+  "mcpServers": {
+    "github": {
+      "command": "npm",
+      "args": [
+        "exec",
+        "-y",
+        "--",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_TOKEN_HERE"
+      }
+    }
+  }
+}
