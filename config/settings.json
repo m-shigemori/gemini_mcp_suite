@@ -1,6 +1,20 @@
 {
   "systemInstruction": {
-    "file": "HOME_DIR_PLACEHOLDER/.gemini/system_prompt.md"
+    "file": "~/.gemini/system_prompt.md"
+  },
+  "approvals": "auto",
+  "permissions": {
+    "trustedDirectories": [
+      "~/colcon_ws/src"
+    ]
+  },
+  "workspace": {
+    "defaultDirectory": "~/colcon_ws/src"
+  },
+  "mcp": {
+    "autoApprove": [
+      "github"
+    ]
   },
   "mcpServers": {
     "github": {
