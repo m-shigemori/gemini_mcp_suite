@@ -35,11 +35,13 @@ if [ -z "$GITHUB_TOKEN" ]; then
     exit 1
 fi
 
-if grep -q "GITHUB_PERSONAL_ACCESS_TOKEN" ~/.bashrc; then
-    sed -i "s|export GITHUB_PERSONAL_ACCESS_TOKEN=.*|export GITHUB_PERSONAL_ACCESS_TOKEN=\"$GITHUB_TOKEN\"|" ~/.bashrc
-else
-    echo "export GITHUB_PERSONAL_ACCESS_TOKEN=\"$GITHUB_TOKEN\"" >> ~/.bashrc
-fi
+echo "export GITHUB_PERSONAL_ACCESS_TOKEN=\"$GITHUB_TOKEN\"" >> ~/.bashrc
+echo "export TERM=xterm-256color" >> ~/.bashrc
+echo "export COLORTERM=truecolor" >> ~/.bashrc
+
+export GITHUB_PERSONAL_ACCESS_TOKEN="$GITHUB_TOKEN"
+export TERM=xterm-256color
+export COLORTERM=truecolor
 
 npm install -g @google/gemini-cli
 npm install -g @modelcontextprotocol/server-github
@@ -55,7 +57,7 @@ cp config/settings.json "$SETTINGS_FILE"
 sed -i "s|HOME_DIR_PLACEHOLDER|$HOME|g" "$SETTINGS_FILE"
 sed -i "s|YOUR_GITHUB_TOKEN_HERE|$GITHUB_TOKEN|g" "$SETTINGS_FILE"
 
-echo "Setup complete! Please run 'source ~/.bashrc' and then 'gemini'."
+echo "Setup complete! Please run 'source ~/.bashrc' and then 'gemini-cli'."
 
 echo -n "Do you want to delete this repository directory ($REPO_DIR)? [y/N]: "
 read DELETE_REPO
