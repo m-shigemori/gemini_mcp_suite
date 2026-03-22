@@ -1,33 +1,47 @@
 {
   "systemInstruction": {
-    "file": "~/.gemini/system_prompt.md"
+    "file": "HOME_DIR_PLACEHOLDER/.gemini/system_prompt.md"
   },
   "approvals": "auto",
   "permissions": {
     "trustedDirectories": [
-      "~/colcon_ws/src"
+      "HOME_DIR_PLACEHOLDER/colcon_ws/src"
     ]
   },
   "workspace": {
-    "defaultDirectory": "~/colcon_ws/src"
+    "defaultDirectory": "HOME_DIR_PLACEHOLDER/colcon_ws/src"
   },
   "mcp": {
     "autoApprove": [
-      "github"
+      "github",
+      "context7",
+      "playwright"
     ]
   },
   "mcpServers": {
     "github": {
-      "command": "npm",
+      "command": "npx",
       "args": [
-        "exec",
         "-y",
-        "--",
         "@modelcontextprotocol/server-github"
       ],
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_TOKEN_HERE"
       }
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ]
     }
   }
 }
