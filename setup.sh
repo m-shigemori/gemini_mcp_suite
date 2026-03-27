@@ -16,10 +16,7 @@ ok()   { echo -e "${G}[OK]${NC} $1"; }
 warn() { echo -e "${Y}[WARN]${NC} $1"; }
 
 for cmd in curl git; do
-    if ! command -v "$cmd" &> /dev/null; then
-        echo -e "${Y}[ERR]${NC} $cmd is not installed." >&2
-        exit 1
-    fi
+    command -v "$cmd" > /dev/null || { echo -e "${Y}[ERR]${NC} $cmd is not installed." >&2; exit 1; }
 done
 
 export NVM_DIR="$HOME/.nvm"
@@ -28,20 +25,23 @@ if [[ ! -s "$NVM_DIR/nvm.sh" ]]; then
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 fi
 
-\. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-info "Setting up Node 22..."
-nvm install 22 --silent
-nvm use 22 --silent
+info "Setting up Node..."
+nvm install --lts --silent
+nvm use --lts --silent
 
-if [[ -z "${GITHUB_PERSONAL_ACCESS_TOKEN}" ]] && ! grep -q "GITHUB_PERSONAL_ACCESS_TOKEN" ~/.bashrc; then
+SHELL_RC="$HOME/.bashrc"
+[[ "$SHELL" == *zsh* ]] && SHELL_RC="$HOME/.zshrc"
+
+if [[ -z "${GITHUB_PERSONAL_ACCESS_TOKEN}" ]] && ! grep -q "^export GITHUB_PERSONAL_ACCESS_TOKEN=" "$SHELL_RC"; then
     warn "GITHUB_PERSONAL_ACCESS_TOKEN not set."
     echo -n "Enter GitHub PAT: "
     read -rs T
     echo ""
-    echo "export GITHUB_PERSONAL_ACCESS_TOKEN=\"$T\"" >> ~/.bashrc
+    echo "export GITHUB_PERSONAL_ACCESS_TOKEN=\"$T\"" >> "$SHELL_RC"
     export GITHUB_PERSONAL_ACCESS_TOKEN="$T"
-    ok "PAT saved to .bashrc"
+    ok "PAT saved"
 else
     info "PAT already configured."
 fi
@@ -53,22 +53,24 @@ npm install -g @google/gemini-cli \
                @playwright/mcp --silent
 
 info "Installing Playwright..."
-npx playwright install --with-deps > /dev/null
+npx playwright install --with-deps || warn "Playwright install failed"
 
 info "Deploying configs..."
 mkdir -p "$CD"
 
 cp config/system_prompt.md "$CD/system_prompt.md"
 cp config/settings.json "$SF"
-sed -i "s|HOME_DIR_PLACEHOLDER|$HOME|g" "$SF"
-sed -i "s|YOUR_GITHUB_TOKEN_HERE|${GITHUB_PERSONAL_ACCESS_TOKEN}|g" "$SF"
+
+sed -i.bak "s|HOME_DIR_PLACEHOLDER|$HOME|g" "$SF"
+sed -i.bak "s|YOUR_GITHUB_TOKEN_HERE|${GITHUB_PERSONAL_ACCESS_TOKEN}|g" "$SF"
+rm -f "$SF.bak"
 
 ok "Done!"
 
 echo ""
 read -p "Delete repo ($RD)? [y/N]: " DEL
 
-if [[ "$DEL" =~ ^[Yy]$ ]]; then
+if [[ "$DEL" =~ ^[Yy]$ ]] && [[ "$RD" != "/" && -n "$RD" ]]; then
     cd "$HOME"
     rm -rf "$RD"
     ok "Repo deleted."
