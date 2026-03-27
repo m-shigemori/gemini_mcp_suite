@@ -2,76 +2,64 @@
 
 set -e
 
-RD=$(pwd)
-CD="$HOME/.gemini"
-SF="$CD/settings.json"
+REPO_DIR=$(pwd)
 
-G='\033[0;32m'
-B='\033[0;34m'
-Y='\033[1;33m'
-NC='\033[0m'
-
-info() { echo -e "${B}[INFO]${NC} $1"; }
-ok()   { echo -e "${G}[OK]${NC} $1"; }
-warn() { echo -e "${Y}[WARN]${NC} $1"; }
+echo "=== Gemini MCP Automation Suite Setup Starting ==="
 
 for cmd in curl git; do
-    command -v "$cmd" > /dev/null || { echo -e "${Y}[ERR]${NC} $cmd is not installed." >&2; exit 1; }
+    command -v "$cmd" > /dev/null || exit 1
 done
 
 export NVM_DIR="$HOME/.nvm"
-if [[ ! -s "$NVM_DIR/nvm.sh" ]]; then
-    info "Installing nvm..."
+
+if [ ! -s "$NVM_DIR/nvm.sh" ]; then
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 fi
 
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-info "Setting up Node..."
-nvm install --lts --silent
-nvm use --lts --silent
+nvm install --lts
+nvm use --lts
+nvm alias default 'lts/*'
 
-SHELL_RC="$HOME/.bashrc"
-[[ "$SHELL" == *zsh* ]] && SHELL_RC="$HOME/.zshrc"
+npm install -g @google/gemini-cli
 
-if [[ -z "${GITHUB_PERSONAL_ACCESS_TOKEN}" ]] && ! grep -q "^export GITHUB_PERSONAL_ACCESS_TOKEN=" "$SHELL_RC"; then
-    warn "GITHUB_PERSONAL_ACCESS_TOKEN not set."
-    echo -n "Enter GitHub PAT: "
-    read -rs T
-    echo ""
-    echo "export GITHUB_PERSONAL_ACCESS_TOKEN=\"$T\"" >> "$SHELL_RC"
-    export GITHUB_PERSONAL_ACCESS_TOKEN="$T"
-    ok "PAT saved"
-else
-    info "PAT already configured."
-fi
-
-info "Installing packages..."
-npm install -g @google/gemini-cli \
-               @modelcontextprotocol/server-github \
-               @upstash/context7-mcp \
-               @playwright/mcp --silent
-
-info "Installing Playwright..."
-npx playwright install --with-deps || warn "Playwright install failed"
-
-info "Deploying configs..."
-mkdir -p "$CD"
-
-cp config/system_prompt.md "$CD/system_prompt.md"
-cp config/settings.json "$SF"
-
-sed -i.bak "s|HOME_DIR_PLACEHOLDER|$HOME|g" "$SF"
-sed -i.bak "s|YOUR_GITHUB_TOKEN_HERE|${GITHUB_PERSONAL_ACCESS_TOKEN}|g" "$SF"
-rm -f "$SF.bak"
-
-ok "Done!"
-
+echo -n "Enter your GitHub Personal Access Token (input is hidden): "
+read -s GITHUB_TOKEN
 echo ""
-read -p "Delete repo ($RD)? [y/N]: " DEL
 
-if [[ "$DEL" =~ ^[Yy]$ ]] && [[ "$RD" != "/" && -n "$RD" ]]; then
-    cd "$HOME"
-    rm -rf "$RD"
-    ok "Repo deleted."
+[ -z "$GITHUB_TOKEN" ] && exit 1
+
+BASHRC="$HOME/.bashrc"
+touch "$BASHRC"
+
+grep -q "GITHUB_PERSONAL_ACCESS_TOKEN" "$BASHRC" 2>/dev/null || echo "export GITHUB_PERSONAL_ACCESS_TOKEN=\"$GITHUB_TOKEN\"" >> "$BASHRC"
+grep -q "TERM=xterm-256color" "$BASHRC" 2>/dev/null || echo 'export TERM=xterm-256color' >> "$BASHRC"
+grep -q "COLORTERM=truecolor" "$BASHRC" 2>/dev/null || echo 'export COLORTERM=truecolor' >> "$BASHRC"
+
+export GITHUB_PERSONAL_ACCESS_TOKEN="$GITHUB_TOKEN"
+export TERM=xterm-256color
+export COLORTERM=truecolor
+
+GEMINI_CONFIG_DIR="$HOME/.gemini"
+mkdir -p "$GEMINI_CONFIG_DIR"
+
+cp config/system_prompt.md "$GEMINI_CONFIG_DIR/system_prompt.md"
+
+SETTINGS_FILE="$GEMINI_CONFIG_DIR/settings.json"
+cp config/settings.json "$SETTINGS_FILE"
+
+sed -i.bak "s|HOME_DIR_PLACEHOLDER|$HOME|g" "$SETTINGS_FILE"
+sed -i.bak "s|YOUR_GITHUB_TOKEN_HERE|$GITHUB_TOKEN|g" "$SETTINGS_FILE"
+rm -f "$SETTINGS_FILE.bak"
+
+echo "Setup complete! Run: source ~/.bashrc && gemini-cli"
+
+echo -n "Delete this repository directory ($REPO_DIR)? [y/N]: "
+read DELETE_REPO
+
+if [[ "$DELETE_REPO" =~ ^[Yy]$ ]] && [[ "$REPO_DIR" != "/" && -n "$REPO_DIR" ]]; then
+    cd ~
+    rm -rf "$REPO_DIR"
+    echo "Repository directory deleted."
 fi
