@@ -5,11 +5,11 @@
   "approvals": "auto",
   "permissions": {
     "trustedDirectories": [
-      "HOME_DIR_PLACEHOLDER/colcon_ws/src"
+      "HOME_DIR_PLACEHOLDER/colcon_ws"
     ]
   },
   "workspace": {
-    "defaultDirectory": "HOME_DIR_PLACEHOLDER/colcon_ws/src"
+    "defaultDirectory": "HOME_DIR_PLACEHOLDER/colcon_ws"
   },
   "mcp": {
     "autoApprove": [
