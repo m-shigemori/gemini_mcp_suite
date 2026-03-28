@@ -15,8 +15,7 @@
     "autoApprove": [
       "github",
       "context7",
-      "playwright",
-      "googledbt"
+      "playwright"
     ]
   },
   "mcpServers": {
@@ -42,13 +41,6 @@
       "args": [
         "-y",
         "@playwright/mcp@latest"
-      ]
-    },
-    "googledbt": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@google/chrome-devtools-mcp"
       ]
     }
   }

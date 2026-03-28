@@ -8,15 +8,20 @@
 
 [JA](README.md) | [EN](README.en.md)
 
-This is a tool suite for quickly and safely automating the setup of Gemini CLI and GitHub MCP server on Ubuntu 24.04.
+This is a tool suite for quickly and safely automating the setup of Gemini CLI and MCP (Model Context Protocol) servers on Ubuntu 24.04.
 Streamline complex environment setup steps into a single script to maximize development efficiency.
 
 ## Key Features
 
-- **Automated Environment Setup**: Automates everything from Node.js 22 (via nvm) installation to package installation.
+- **Automated Environment Setup**: Automates everything from Node.js (via nvm) installation to package installation.
 - **Secure Authentication Management**: Interactively retrieves GitHub tokens and securely sets them in `.bashrc`.
 - **Config Sync**: Automatically deploys `settings.json` for MCP servers and custom system prompts.
 - **Portability**: Clone the repository and run the script to instantly reproduce the same AI development environment.
+
+## Requirements
+
+- OS: Linux (Ubuntu 24.04 recommended)
+- curl, git
 
 ## Installation
 
@@ -28,7 +33,7 @@ bash setup.sh
 
 This script automatically handles Node.js setup, library installation, and configuration file placement.
 
-*To apply the settings, reload `~/.bashrc` with the following command after execution:
+※ To apply the settings, reload `~/.bashrc` with the following command after execution:
 
 ```bash
 source ~/.bashrc
@@ -41,10 +46,11 @@ source ~/.bashrc
 gemini
 ```
 
-## Requirements
+## Supported MCPs
 
-- OS: Linux (Ubuntu 24.04 recommended)
-- curl, git
+- GitHub
+- Context7
+- Playwright
 
 ## License
 
