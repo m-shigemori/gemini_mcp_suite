@@ -5,11 +5,17 @@
   "approvals": "auto",
   "permissions": {
     "trustedDirectories": [
-      "HOME_DIR_PLACEHOLDER/colcon_ws"
+      "HOME_DIR_PLACEHOLDER/colcon_ws/src"
     ]
   },
   "workspace": {
-    "defaultDirectory": "HOME_DIR_PLACEHOLDER/colcon_ws"
+    "defaultDirectory": "HOME_DIR_PLACEHOLDER/colcon_ws",
+    "ignore": [
+      "**/build/**",
+      "**/install/**",
+      "**/log/**",
+      "**/.git/**"
+    ]
   },
   "mcp": {
     "autoApprove": [
